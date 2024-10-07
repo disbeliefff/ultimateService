@@ -8,7 +8,7 @@ TEMPO           := grafana/tempo:2.5.0
 LOKI            := grafana/loki:3.1.0
 PROMTAIL        := grafana/promtail:3.1.0
 
-KIND_CLUSTER    := ardan-starter-cluster
+KIND_CLUSTER    := starter-cluster
 NAMESPACE       := sales-system
 SERVICE-NAME    := sales-api
 AUTH_APP        := auth
@@ -51,3 +51,18 @@ service:
         --build-arg BUILD_REF=0.0.1 \
         --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
         .
+dev-load:
+	kind load docker-image $(SALES_IMAGE) --name $(KIND_CLUSTER)
+
+dev-apply:
+	kustomize build zarf/k8s/dev/sales | kubectl apply -f -
+	kubectl wait pods --namespace=$(NAMESPACE) --selector app=$(SALES_APP) --timeout=120s --for=condition=Ready
+
+dev-logs:
+	kubectl logs --namespace=$(NAMESPACE) -l app=$(SALES_APP) -f --tail=100 -c init-migrate-seed
+
+dev-describe-deployment:
+	kubectl describe deployment --namespace=$(NAMESPACE) $(SALES_APP)
+
+dev-describe-sales:
+	kubectl describe pod --namespace=$(NAMESPACE) -l app=$(SALES_APP)
