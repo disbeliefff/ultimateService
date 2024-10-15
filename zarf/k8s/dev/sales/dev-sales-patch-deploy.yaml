@@ -5,10 +5,6 @@ metadata:
   namespace: sales-system
 
 spec:
-  selector:
-    matchLabels:
-      app: sales
-
   replicas: 1
 
   strategy:
@@ -18,8 +14,15 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
+
+
       containers:
         - name: sales
-
-
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "500m"
+            limits:
+              cpu: "100m"
+              memory: "100m"
 
