@@ -52,7 +52,7 @@ service:
         --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
         .
 dev-load:
-	kind load docker-image $(SALES_IMAGE) --name $(KIND_CLUSTER)
+	kind load docker-image localhost/disbeliefff:0.0.1 --name $(KIND_CLUSTER)
 
 dev-apply:
 	kustomize build zarf/k8s/dev/sales | kubectl apply -f -
@@ -66,3 +66,7 @@ dev-describe-deployment:
 
 dev-describe-sales:
 	kubectl describe pod --namespace=$(NAMESPACE) -l app=$(SALES_APP)
+
+tidy:
+	go mod tidy && go mod vendor
+
